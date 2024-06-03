@@ -25,6 +25,7 @@ dt<-data.frame(dades$SEXE, dades$EDAT, dades$EDAT_GR, dades$ESTUDIS_1_15, dades$
 names(dt)=c("sexe","edat", "edat_grups", "estudis","ingressos","situaciolaboral","independencia","vot","noactiu", 
             "estudis", "ideologia", "valGen", "interespol", "llengua", "procedencia", "vot_darreres")
 
+#Codificació de les variables
 freq(dt$sexe)
 dt$estudis[dt$estudis==98]<-NA
 dt$estudis[dt$estudis==99]<-NA
@@ -151,13 +152,13 @@ dt$vot[dt$vot==4]<-0
 dt$vot[dt$vot==5]<-1
 dt$vot<-factor(dt$vot, levels=c(0,1), labels=c("Abstencio", "vot"))
 
-
+#Creació del model abstenció general
 rlmb<-glm(data=dt, formula=vot~sexe+edat_grups+procedencia+ingressos+estudis+situaciolaboral+llengua+ideologia+valGen+interespol+independencia+vot_darreres, family="binomial")
 summary(rlmb)
 plot_summs(rlmb)
 PseudoR2(rlmb, which = c ("CoxSnell", "Nagelkerke", "McFadden"))
 
-
+#Establiment de les probabilitats de vot
 effect_plot(rlmb, pred = sexe, interval = TRUE, plot.points = TRUE)
 effect_plot(rlmb, pred = edat_grups, interval = TRUE, plot.points = TRUE)
 effect_plot(rlmb, pred = ingressos, interval = TRUE, plot.points = TRUE)
@@ -271,19 +272,14 @@ prop.table(table(dt$vot, dt$independencia),1)
 crosstab(dt$vot, dt$independencia, prop.c="T")
 summary(dt$inde)
 
-#Anàlisi independentisme
+#Creació del model independentista
 independentistes <- subset(dt, independencia == 1)
-
-table(independentistes$sexe)
-sum(is.na(dt$independencia))
-
-
 rlmb_inde<-glm(data=independentistes, formula=vot~sexe+edat_grups+ingressos+estudis+situaciolaboral+ideologia+valGen+interespol+llengua+procedencia+vot_darreres, family="binomial")
 summary(rlmb_inde)
 plot_summs(rlmb, rlmb_inde)
 PseudoR2(rlmb_inde, which = c ("CoxSnell", "Nagelkerke", "McFadden"))
 
-
+#Establiment de les probabilitats de vot
 effect_plot(rlmb_inde, pred = sexe, interval = TRUE, plot.points = TRUE)
 effect_plot(rlmb_inde, pred = edat_grups, interval = TRUE, plot.points = TRUE)
 effect_plot(rlmb_inde, pred = ingressos, interval = TRUE, plot.points = TRUE)
